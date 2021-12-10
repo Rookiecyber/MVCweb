@@ -9,21 +9,20 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Insert title here</title>
+    <title>文件上传</title>
 </head>
 <body>
-<form action="/uploadFile/up" method="post" enctype="multipart/form-data">
+<form action="/file/upload" method="post" enctype="multipart/form-data">
     <table>
         <tr>
             <td>上传文件</td>
             <td>
-                <input type="file" name="fileUP" />
+                <input type="file" name="file" />
             </td>
         </tr>
         <tr>
             <td colspan="2">
                 <input type="submit" />
-                <input type="image" />
             </td>
         </tr>
     </table>

@@ -11,15 +11,8 @@
     <title>Title</title>
 </head>
 <body>
-<h1>hhhhhhhhhhhhhhh</h1>
-<form action="/test/login", method="get">
-    账号:<br>
-    <input type="text" name="username" placeholder="账号 ">
-    <br>
-    密码:<br>
-    <input type="text" name="password" placeholder="密码">
-    <br><br>
-    <input type="submit" value="登录">
-</form>
+<h1>mvc框架</h1>
+<div><a href="upload.jsp">文件上传</a></div>
+
 </body>
 </html>
