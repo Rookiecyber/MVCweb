@@ -1,8 +1,6 @@
 package com.chuan.servlet;
 
-import com.chuan.annotation.MyController;
-import com.chuan.annotation.MyRequestMapping;
-import com.chuan.annotation.MyRequestParam;
+import com.chuan.annotation.*;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -13,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.*;
@@ -41,6 +40,8 @@ public class MyDispatcherServlet extends HttpServlet {
         //将包含controller注解的类的对象放到ioc容器中
         doPutIoc();
         //映射url
+        //依赖注入
+        doAutowired();
         getMapping();
         System.out.println("init完毕！");
     }
@@ -94,9 +95,24 @@ public class MyDispatcherServlet extends HttpServlet {
         }
         for (String className:classNames){
             try {
-                Class clazz= Class.forName(className);
+                // 读取类,通过反射来实例化
+                Class<?> clazz= Class.forName(className);
                 if (clazz.isAnnotationPresent(MyController.class)){
                     IOCObject.put(toLowerFirstWord(clazz.getSimpleName()),clazz.newInstance());
+                }else if(clazz.isAnnotationPresent(MyService.class)){
+                    MyService annotation = clazz.getAnnotation(MyService.class);
+                    String beanName = annotation.value();
+                    Object beanInstance = clazz.newInstance();
+                    if (Objects.equals("", beanName)) {
+                        // 多个接口
+                        Class<?>[] interfaces = clazz.getInterfaces();
+                        for(Class<?> c1 : interfaces){
+                            String classSimpleName = toLowerFirstWord(c1.getSimpleName());
+                            IOCObject.put(classSimpleName, beanInstance);
+                        }
+                    }else {
+                        IOCObject.put(beanName,beanInstance);
+                    }
                 }
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException("类未找到！");
@@ -104,6 +120,40 @@ public class MyDispatcherServlet extends HttpServlet {
                 throw new RuntimeException("不能实例化！");
             } catch (IllegalAccessException e) {
                 throw new RuntimeException("无权限操作！");
+            }
+        }
+    }
+    public void doAutowired(){
+        if (IOCObject.size() ==0 ){
+            return;
+        }
+        Iterator<Map.Entry<String, Object>> iocIter = IOCObject.entrySet().iterator();
+        while (iocIter.hasNext()){
+            //  /*classSimpleName*/, Object /*Class instance*/
+            Map.Entry<String, Object> entry = iocIter.next();
+            String classSimpleName = entry.getKey();
+            Object beanInstance = entry.getValue();
+            // 目前实现成员变量的依赖注入
+            // 后续处理构造器和方法
+            Field[] declaredFields = beanInstance.getClass().getDeclaredFields();
+            for (Field declaredField: declaredFields) {
+                if (declaredField.isAnnotationPresent(MyAutowired.class)){
+                    declaredField.setAccessible(true);
+                    MyAutowired myEasyAutowired = declaredField.getAnnotation(MyAutowired.class);
+                    String autowiredBeanName = myEasyAutowired.value();
+                    if (Objects.equals("",autowiredBeanName) || Objects.equals(null, autowiredBeanName)){
+                        Class<?> declaredFieldType = declaredField.getType();
+                        autowiredBeanName = toLowerFirstWord(declaredFieldType.getSimpleName());
+                    }
+                    try {
+                        Object Service = declaredField.get(beanInstance);
+                        declaredField.setAccessible(true);
+                        declaredField.set(beanInstance, IOCObject.get(autowiredBeanName));
+                        Service = declaredField.get(beanInstance);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
     }

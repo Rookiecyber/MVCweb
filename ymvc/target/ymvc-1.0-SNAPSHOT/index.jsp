@@ -8,7 +8,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Title</title>
+    <title>MVCweb</title>
 </head>
 <body>
 <h1>mvc框架</h1>
