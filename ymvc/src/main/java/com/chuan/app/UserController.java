@@ -1,10 +1,9 @@
 package com.chuan.app;
 
-import com.chuan.annotation.MyAutowired;
-import com.chuan.annotation.MyController;
-import com.chuan.annotation.MyRequestMapping;
-import com.chuan.annotation.MyRequestParam;
+import com.chuan.annotation.*;
 import com.chuan.app.entity.User;
+import com.chuan.app.service.HelloService;
+import com.chuan.app.service.UserService;
 import com.chuan.app.service.UserServiceImpl;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,28 +20,38 @@ import java.util.List;
 @MyRequestMapping("/user")
 public class UserController {
     @MyAutowired
-    UserServiceImpl userService;
+    UserService userService;
 
-    @MyRequestMapping("/find")
-    public void find(HttpServletRequest request, HttpServletResponse response) throws Exception{
-        User u = new User("test","zhangsan",20);
-
-        String UserJson = JSON.toJSONString(u);
+    @MyAutowired
+    HelloService helloService;
+    @MyRequestMapping("/say")
+    public void say(HttpServletRequest request, HttpServletResponse response) throws Exception{
+        helloService.sayHi("zhangsan");
+        response.getWriter().println("UserJson");
+    }
+    @MyRequestMapping("/findById")
+    public void find(HttpServletRequest request, HttpServletResponse response,
+        @MyRequestParam("id") String id ) throws Exception{
+        User user =  userService.findByID(id);
+        String UserJson = JSON.toJSONString(user);
         response.getWriter().println(UserJson);
+    }
+    @MyRequestMapping("/add")
+    public void add(HttpServletRequest request, HttpServletResponse response,
+                     @MyRequestParam("id") String id,@MyRequestParam("name") String name,@MyRequestParam("age") String age ) throws Exception{
+        userService.insert(id,name,Integer.valueOf(age).intValue());
+        response.getWriter().println("Insert success!");
+    }
+    @MyRequestMapping("/delete")
+    public void delete(HttpServletRequest request, HttpServletResponse response,
+                    @MyRequestParam("id") String id ) throws Exception{
+        userService.delete(id);
+        response.getWriter().println("Delete success!");
     }
     @MyRequestMapping("/findAll")
     public void findAll(HttpServletRequest request, HttpServletResponse response) throws Exception{
-//        List<User> users= userService.getAll();
-        List<User> users = new ArrayList<User>();
-        System.out.println(users.size());
-        users.add( new User("1","zhangsan",20));
-        users.add( new User("2","zhangsan",20));
-        users.add( new User("3","zhangsan",20));
+        List<User> users= userService.getAll();
         String ListUserJson = JSON.toJSONString(users);
         response.getWriter().println(ListUserJson);
-    }
-    @MyRequestMapping("/add")
-    public void add(@MyRequestParam("a") int a, @MyRequestParam("b")int b,HttpServletRequest request ,HttpServletResponse response) throws Exception{
-        response.getWriter().println(a+b);
     }
 }

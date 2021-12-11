@@ -3,9 +3,9 @@ package com.chuan.app.entity;
 public class User {
     private String userId;
     private String name;
-    private Integer age;
+    private int age;
     public User(){}
-    public User(String userId,String name,Integer age){
+    public User(String userId,String name,int age){
         this.userId = userId;
         this.name = name;
         this.age = age;
@@ -25,7 +25,7 @@ public class User {
     public Integer getAge() {
         return age;
     }
-    public void setAge(Integer age) {
+    public void setAge(int age) {
         this.age = age;
     }
 }

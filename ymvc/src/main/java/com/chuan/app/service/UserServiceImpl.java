@@ -15,7 +15,7 @@ public class UserServiceImpl implements UserService{
         addUser("3","wangwu",21);
     }
     //静态方法模拟数据库
-    public static void addUser(String id,String name,Integer age)
+    public static void addUser(String id,String name,int age)
     {
         User u=new User();
         u.setAge(age);
@@ -24,12 +24,13 @@ public class UserServiceImpl implements UserService{
         users.add(u);
     }
     @Override
-    public void insert(String id,String name,Integer age){
-        User u=new User();
-        u.setAge(age);
-        u.setUserId(id);
-        u.setName(name);
-        users.add(u);
+    public void insert(String id,String name,int  age){
+//        User u=new User();
+//        u.setAge(age);
+//        u.setUserId(id);
+//        u.setName(name);
+//        users.add(u);
+        addUser(id,name,age);
     }
     @Override
     public void delete(String id){

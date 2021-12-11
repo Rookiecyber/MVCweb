@@ -47,8 +47,7 @@ public class MyDispatcherServlet extends HttpServlet {
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-       doPost(req,resp);
-
+        doPost(req,resp);
     }
 
     private void loadProperties(String location){
@@ -133,7 +132,7 @@ public class MyDispatcherServlet extends HttpServlet {
             Map.Entry<String, Object> entry = iocIter.next();
             String classSimpleName = entry.getKey();
             Object beanInstance = entry.getValue();
-            // 目前实现成员变量的依赖注入
+            //  目前实现成员变量的依赖注入
             // 后续处理构造器和方法
             Field[] declaredFields = beanInstance.getClass().getDeclaredFields();
             for (Field declaredField: declaredFields) {
@@ -175,7 +174,7 @@ public class MyDispatcherServlet extends HttpServlet {
                 if (!method.isAnnotationPresent(MyRequestMapping.class)){
                     continue;
                 }
-               String url = baseUrl+ method.getAnnotation(MyRequestMapping.class).value();
+                String url = baseUrl+ method.getAnnotation(MyRequestMapping.class).value();
                 url=url.replaceAll("/+","/");
                 try {
                     handlerMapping.put(url,method);
@@ -243,14 +242,14 @@ public class MyDispatcherServlet extends HttpServlet {
                 paramValues[i]=resp;
                 continue;
             }else {
-                  for (Entry<String,String[]> entry:parameterMap.entrySet()){
-                        if (requestParamList.get(j).equals(entry.getKey())) {
-                            //相同的参数只取第一个的值
-                            paramValues[i]=entry.getValue()[0];
-                            continue;
-                        }
+                for (Entry<String,String[]> entry:parameterMap.entrySet()){
+                    if (requestParamList.get(j).equals(entry.getKey())) {
+                        //相同的参数只取第一个的值
+                        paramValues[i]=entry.getValue()[0];
+                        continue;
                     }
-                  j++;
+                }
+                j++;
             }
         }
         method.invoke(handlerController.get(url),paramValues);
